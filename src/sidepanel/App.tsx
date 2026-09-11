@@ -11,10 +11,6 @@ type Article = {
 	collection: string
 }
 
-const mockDetectedDois = [
-	'10.1038/s41586-020-2649-2',
-	'10.1145/3368089.3409741',
-]
 const statusCopy: Record<
 	Status,
 	{ label: string; detail: string; tone: string }
@@ -70,15 +66,29 @@ export default function App() {
 	const currentDoi = customDoi.trim() || selectedDoi
 	const copy = useMemo(() => statusCopy[status], [status])
 
-	const detectDoi = () => {
+	const detectDoi = async () => {
 		setStatus('checking')
 		setArticle(null)
-		window.setTimeout(() => {
-			const uniqueDois = [...new Set(mockDetectedDois)]
+		setErrorDetail('')
+		try {
+			const [tab] = await chrome.tabs.query({
+				active: true,
+				currentWindow: true,
+			})
+			if (!tab.id) throw new Error('No active tab found.')
+
+			const response = await chrome.tabs.sendMessage(tab.id, {
+				type: 'detect-dois',
+			}) as { dois?: string[] }
+			const uniqueDois = [...new Set(response.dois ?? [])]
 			setDetectedDois(uniqueDois)
 			setSelectedDoi(uniqueDois[0] ?? '')
 			setStatus(uniqueDois.length ? 'idle' : 'no-doi')
-		}, 500)
+		} catch {
+			setDetectedDois([])
+			setSelectedDoi('')
+			setStatus('no-doi')
+		}
 	}
 	const checkArticle = async () => {
 		setArticle(null)

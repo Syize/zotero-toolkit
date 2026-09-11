@@ -17,6 +17,7 @@ export default defineManifest({
   permissions: [
     'sidePanel',
     'contentSettings',
+    'activeTab',
   ],
   host_permissions: [
     'http://localhost:23119/*',
@@ -24,7 +25,7 @@ export default defineManifest({
   ],
   content_scripts: [{
     js: ['src/content/main.tsx'],
-    matches: ['https://*/*'],
+    matches: ['http://*/*', 'https://*/*'],
   }],
   side_panel: {
     default_path: 'src/sidepanel/index.html',
