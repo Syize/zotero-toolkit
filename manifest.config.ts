@@ -18,6 +18,10 @@ export default defineManifest({
     'sidePanel',
     'contentSettings',
   ],
+  host_permissions: [
+    'http://localhost:23119/*',
+    'http://127.0.0.1:23119/*',
+  ],
   content_scripts: [{
     js: ['src/content/main.tsx'],
     matches: ['https://*/*'],

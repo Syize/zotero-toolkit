@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { findArticleByDoi } from '@/lib/zotero'
 
 type Status = 'idle' | 'checking' | 'no-doi' | 'found' | 'not-found' | 'error'
 type Article = {
@@ -14,14 +15,6 @@ const mockDetectedDois = [
 	'10.1038/s41586-020-2649-2',
 	'10.1145/3368089.3409741',
 ]
-const mockArticle: Article = {
-	title: 'A general framework for checking whether a scholarly article is already available in a personal library',
-	author: 'Jane Doe, Alex Smith',
-	year: '2024',
-	publisher: 'Nature Portfolio',
-	doi: '10.1038/s41586-020-2649-2',
-	collection: 'Research / Literature Review',
-}
 const statusCopy: Record<
 	Status,
 	{ label: string; detail: string; tone: string }
@@ -72,6 +65,7 @@ export default function App() {
 	const [selectedDoi, setSelectedDoi] = useState('')
 	const [customDoi, setCustomDoi] = useState('')
 	const [article, setArticle] = useState<Article | null>(null)
+	const [errorDetail, setErrorDetail] = useState('')
 	const isBusy = status === 'checking'
 	const currentDoi = customDoi.trim() || selectedDoi
 	const copy = useMemo(() => statusCopy[status], [status])
@@ -86,19 +80,26 @@ export default function App() {
 			setStatus(uniqueDois.length ? 'idle' : 'no-doi')
 		}, 500)
 	}
-	const checkArticle = () => {
+	const checkArticle = async () => {
 		setArticle(null)
+		setErrorDetail('')
 		if (!currentDoi) {
 			setStatus('no-doi')
 			return
 		}
 		setStatus('checking')
-		window.setTimeout(() => {
-			if (currentDoi === mockArticle.doi) {
-				setArticle(mockArticle)
+		try {
+			const foundArticle = await findArticleByDoi(currentDoi)
+			if (foundArticle) {
+				setArticle(foundArticle)
 				setStatus('found')
-			} else setStatus('not-found')
-		}, 700)
+			} else {
+				setStatus('not-found')
+			}
+		} catch (error) {
+			setErrorDetail(error instanceof Error ? error.message : 'The Zotero request failed.')
+			setStatus('error')
+		}
 	}
 
 	return (
@@ -172,7 +173,7 @@ export default function App() {
 						<h2 className="font-medium">{copy.label}</h2>
 					</div>
 					<p className="mt-1 text-sm leading-5 opacity-85">
-						{copy.detail}
+						{status === 'error' && errorDetail ? errorDetail : copy.detail}
 					</p>
 				</section>
 				<section className="mt-5">
