@@ -1,3 +1,35 @@
 # Zotero Toolit
 
-一个方便的浏览器插件，将从浏览器页面抓取到的 DOI 号或你输入的 DOI 号与 Zotero 文献库中的文献对比，检查相应的文献是否已经存在于你的文献库中。
+A convenient browser extension which can check if the article exists in your Zotero collections.
+
+It can extract DOIs from the web page. You can also paste the DOI you want to check.
+
+---
+
+## Screenshots
+
+![Screenshot](pics/screenshot.png)
+
+---
+
+## How To Use
+
+1. Clone this repo.
+2. Install dependencies.
+
+```bash
+pnpm install
+```
+
+3. Build package.
+
+```bash
+pnpm build
+```
+
+4. Extract the zip file in `release` to the locationo you like.
+5. Load unpacked extension in your browser.
+
+## THANKS
+
+- [crxjs](https://crxjs.dev/): Browser extension framework.
