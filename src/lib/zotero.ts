@@ -14,6 +14,7 @@ type ZoteroItem = {
 		title?: string
 		creators?: ZoteroCreator[]
 		date?: string
+		publicationTitle?: string
 		publisher?: string
 		DOI?: string
 		collections?: string[]
@@ -105,20 +106,25 @@ export async function findArticleByDoi(doi: string): Promise<ZoteroArticle | nul
 	if (!item?.data) return null
 
 	const collectionNames = new Map<string, string>()
-	if (item.data.collections?.length) {
-		const collections = await zoteroFetch<ZoteroCollection[]>(
-			'/users/0/collections?format=json&limit=100',
-		)
-		for (const collection of collections) {
-			if (collection.data?.name) collectionNames.set(collection.key, collection.data.name)
-		}
-	}
+	await Promise.all(
+		(item.data.collections ?? []).map(async (collectionKey) => {
+			try {
+				const collection = await zoteroFetch<ZoteroCollection>(
+					`/users/0/collections/${encodeURIComponent(collectionKey)}?format=json`,
+				)
+				collectionNames.set(collectionKey, collection.data?.name ?? collectionKey)
+			} catch {
+				// Keep the key visible if a collection cannot be resolved.
+				collectionNames.set(collectionKey, collectionKey)
+			}
+		}),
+	)
 
 	return {
 		title: item.data.title ?? '',
 		author: formatCreators(item.data.creators),
 		year: item.data.date?.match(/\b\d{4}\b/)?.[0] ?? '',
-		publisher: item.data.publisher ?? '',
+		publisher: item.data.publicationTitle ?? item.data.publisher ?? '',
 		doi: item.data.DOI ?? normalizedDoi,
 		collection: (item.data.collections ?? []).map((key) => collectionNames.get(key) ?? key).join(', '),
 	}

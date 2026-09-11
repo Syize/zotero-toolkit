@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
 import { findArticleByDoi } from '@/lib/zotero'
+import { useMemo, useState } from 'react'
 
 type Status = 'idle' | 'checking' | 'no-doi' | 'found' | 'not-found' | 'error'
 type Article = {
@@ -54,7 +54,7 @@ const fields: Array<{ label: string; key: keyof Article }> = [
 	{ label: 'Title', key: 'title' },
 	{ label: 'Author', key: 'author' },
 	{ label: 'Year', key: 'year' },
-	{ label: 'Publisher', key: 'publisher' },
+	{ label: 'Publication', key: 'publisher' },
 	{ label: 'DOI', key: 'doi' },
 	{ label: 'Collection Location', key: 'collection' },
 ]
@@ -97,7 +97,11 @@ export default function App() {
 				setStatus('not-found')
 			}
 		} catch (error) {
-			setErrorDetail(error instanceof Error ? error.message : 'The Zotero request failed.')
+			setErrorDetail(
+				error instanceof Error
+					? error.message
+					: 'The Zotero request failed.',
+			)
 			setStatus('error')
 		}
 	}
@@ -173,7 +177,9 @@ export default function App() {
 						<h2 className="font-medium">{copy.label}</h2>
 					</div>
 					<p className="mt-1 text-sm leading-5 opacity-85">
-						{status === 'error' && errorDetail ? errorDetail : copy.detail}
+						{status === 'error' && errorDetail
+							? errorDetail
+							: copy.detail}
 					</p>
 				</section>
 				<section className="mt-5">
