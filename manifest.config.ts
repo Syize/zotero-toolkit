@@ -8,12 +8,14 @@ export default defineManifest({
 	icons: {
 		48: 'public/logo.png',
 	},
-	action: {
-		default_icon: {
-			48: 'public/logo.png',
-		},
-		default_popup: 'src/popup/index.html',
-	},
+  action: {
+    default_icon: {
+      48: 'public/logo.png',
+    },
+  },
+  background: {
+    service_worker: 'src/background.ts',
+  },
 	permissions: ['sidePanel'],
 	host_permissions: ['http://localhost:23119/*', 'http://127.0.0.1:23119/*'],
 	content_scripts: [
