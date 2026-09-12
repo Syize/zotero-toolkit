@@ -14,6 +14,8 @@ It can extract DOIs from the web page. You can also paste the DOI you want to ch
 
 ## How To Use
 
+0. Go to `Edit -> Settings -> Advanced`, make sure `Allow other applications on this computer to communicate with Zotero` is enabled.
+
 1. Clone this repo.
 2. Install dependencies.
 
@@ -33,3 +35,4 @@ pnpm build
 ## THANKS
 
 - [crxjs](https://crxjs.dev/): Browser extension framework.
+- [Tailwindcss](https://tailwindcss.com/): A utility-first CSS framework.
