@@ -62,6 +62,7 @@ export default function App() {
 	const [customDoi, setCustomDoi] = useState('')
 	const [article, setArticle] = useState<Article | null>(null)
 	const [errorDetail, setErrorDetail] = useState('')
+	const [hasCopiedDoi, setHasCopiedDoi] = useState(false)
 	const isBusy = status === 'checking'
 	const currentDoi = customDoi.trim() || selectedDoi
 	const copy = useMemo(() => statusCopy[status], [status])
@@ -70,6 +71,7 @@ export default function App() {
 		setStatus('checking')
 		setArticle(null)
 		setErrorDetail('')
+		setHasCopiedDoi(false)
 		try {
 			const [tab] = await chrome.tabs.query({
 				active: true,
@@ -88,6 +90,17 @@ export default function App() {
 			setDetectedDois([])
 			setSelectedDoi('')
 			setStatus('no-doi')
+		}
+	}
+	const copySelectedDoi = async () => {
+		if (!selectedDoi) return
+
+		try {
+			await navigator.clipboard.writeText(selectedDoi)
+			setHasCopiedDoi(true)
+			window.setTimeout(() => setHasCopiedDoi(false), 1500)
+		} catch {
+			setHasCopiedDoi(false)
 		}
 	}
 	const checkArticle = async () => {
@@ -127,23 +140,36 @@ export default function App() {
 				<section className="space-y-5 border-b border-[#9d8e8e] py-6">
 					<label className="block text-slate-500">
 						<span className="mb-2 block">Detected DOIs</span>
-						<select
-							value={selectedDoi}
-							onChange={(e) => setSelectedDoi(e.target.value)}
-							disabled={isBusy}
-							className="h-10 w-full rounded-lg border border-slate-200 bg-white px-4 text-slate-800 outline-none transition focus:border-slate-500 disabled:cursor-not-allowed disabled:bg-slate-50"
-						>
-							{detectedDois.length === 0 && (
-								<option value="">
-									Detect a DOI on the current page
-								</option>
-							)}
-							{detectedDois.map((doi) => (
-								<option key={doi} value={doi}>
-									{doi}
-								</option>
-							))}
-						</select>
+						<div className="flex gap-2">
+							<button
+								type="button"
+								onClick={copySelectedDoi}
+								disabled={isBusy || !selectedDoi}
+								className="h-10 shrink-0 rounded-lg border border-slate-900 bg-white px-3 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
+							>
+								{hasCopiedDoi ? 'Copied' : 'Copy'}
+							</button>
+							<select
+								value={selectedDoi}
+								onChange={(e) => {
+									setSelectedDoi(e.target.value)
+									setHasCopiedDoi(false)
+								}}
+								disabled={isBusy}
+								className="h-10 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-slate-800 outline-none transition focus:border-slate-500 disabled:cursor-not-allowed disabled:bg-slate-50"
+							>
+								{detectedDois.length === 0 && (
+									<option value="">
+										Detect a DOI on the current page
+									</option>
+								)}
+								{detectedDois.map((doi) => (
+									<option key={doi} value={doi}>
+										{doi}
+									</option>
+								))}
+							</select>
+						</div>
 					</label>
 					<label className="block text-slate-500">
 						<span className="mb-2 block">

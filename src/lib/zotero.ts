@@ -105,9 +105,10 @@ export async function findArticleByDoi(doi: string): Promise<ZoteroArticle | nul
 
 	if (!item?.data) return null
 
+	const collectionKeys = item.data.collections ?? []
 	const collectionNames = new Map<string, string>()
 	await Promise.all(
-		(item.data.collections ?? []).map(async (collectionKey) => {
+		collectionKeys.map(async (collectionKey) => {
 			try {
 				const collection = await zoteroFetch<ZoteroCollection>(
 					`/users/0/collections/${encodeURIComponent(collectionKey)}?format=json`,
@@ -126,6 +127,8 @@ export async function findArticleByDoi(doi: string): Promise<ZoteroArticle | nul
 		year: item.data.date?.match(/\b\d{4}\b/)?.[0] ?? '',
 		publisher: item.data.publicationTitle ?? item.data.publisher ?? '',
 		doi: item.data.DOI ?? normalizedDoi,
-		collection: (item.data.collections ?? []).map((key) => collectionNames.get(key) ?? key).join(', '),
+		collection: collectionKeys.length
+			? collectionKeys.map((key) => collectionNames.get(key) ?? key).join(', ')
+			: 'Not in any collection',
 	}
 }
