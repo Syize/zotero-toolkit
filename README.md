@@ -2,7 +2,7 @@
 
 A convenient browser extension which can check if the article exists in your Zotero collections.
 
-It can extract DOIs from the web page. You can also paste the DOI you want to check.
+It can extract DOIs from the web page, then you can check if you have saved this article to your Zotero, and copy the DOI by just a single click. You can also paste the DOI you want to check.
 
 ---
 
@@ -15,6 +15,12 @@ It can extract DOIs from the web page. You can also paste the DOI you want to ch
 ## How To Use
 
 0. Go to `Edit -> Settings -> Advanced`, make sure `Allow other applications on this computer to communicate with Zotero` is enabled.
+
+Then:
+
+1. Install this extension from [Chrome Web Store](https://chromewebstore.google.com/detail/laaoohndikflcmdjilcalogjnngihmnn?utm_source=item-share-cb)
+
+Or:
 
 1. Clone this repo.
 2. Install dependencies.
